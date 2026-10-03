@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: paybridge
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  port: 8080
+
+paybridge:
+  services:
+    base-url: http://localhost:8081
+
