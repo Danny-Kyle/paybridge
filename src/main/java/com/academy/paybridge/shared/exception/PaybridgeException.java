@@ -11,28 +11,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 public abstract class PaybridgeException extends RuntimeException {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    private final String code;
 
-    @RestControllerAdvice
-    public class GlobalExceptionHandler{
-        ProblemDetail handleValidation(MethodArgumentNotValidException e){};
-        ProblemDetail handleNotFound(ResourceNotFoundException e){};
-        ProblemDetail handleBusinessValue (BusinessRuleException e){};
-        ProblemDetail handleUnexpected(Exception){}
-    }
+    protected PaybridgeException(String code, String message) {
+        super(message);
+        this.code = code;
+    };
 
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-//        StringBuilder message = new StringBuilder();
-//        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-//
-//        }
-String detailMessage = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-
-        ProblemDetail problem =ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detailMessage);
-        problem.setTitle("Bad Request");
-
-        return problem.toString();
-    }
+    public String getCode() {
+        return code;
+    };
 }
