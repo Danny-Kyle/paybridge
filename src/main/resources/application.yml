@@ -4,11 +4,32 @@ spring:
   threads:
     virtual:
       enabled: true
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/paybridge}
+    username: ${DB_USERNAME:paybridge}
+    password: ${DB_PASSWORD:paybridge}
+    hikari:
+      maximum-pool-size: 20
+      connection-timeout: 3000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    locations:
+      - classpath:db/migration
 
 server:
   port: 8080
 
 paybridge:
+  routing:
+    next-of-kin-threshold-minor: 10000000
+  gateway:
+    mode: simulated
+  paystack:
+    base-url: https://api.paystack.co
+    secret-key: ${PAYSTACK_SECRET_KEY:}
   services:
     base-url: http://localhost:8081
 
