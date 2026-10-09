@@ -1,6 +1,7 @@
 package com.academy.paybridge.account.api;
 
-import java.util.Currency;
+import com.academy.paybridge.shared.money.Currency;
+
 import java.util.UUID;
 
 public record AccountSummary(UUID accountId, UUID customerId, String accountNumber, String accountName,

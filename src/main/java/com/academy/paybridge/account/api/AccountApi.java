@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface AccountApi {
     Optional<AccountSummary> findPrimaryAccount(UUID customerId);
     Optional<Money> findBalance(UUID customerId);
-    AccountSummary findAccount(UUID accountId);
+    AccountSummary getAccount(UUID accountId);
     void debit(UUID accountId, Money amount);
     void credit(UUID accountId, Money amount);
 
