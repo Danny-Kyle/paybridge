@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public record DesignateNextofKinRequest(
         @NotNull
-        UUID customerId
+        UUID customerId,
 
         @NotNull
         Relationship relationship

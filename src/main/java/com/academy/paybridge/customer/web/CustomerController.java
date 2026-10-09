@@ -1,30 +1,45 @@
 package com.academy.paybridge.customer.web;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.academy.paybridge.customer.domain.Customer;
+import com.academy.paybridge.customer.service.CustomerService;
+import com.academy.paybridge.customer.service.OnboardCommand;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/customer")
 public class CustomerController {
-
-    @PostMapping()
-
-
-    @GetMapping("/hello")
-    public String hello(){
-        return "Hello from " + Thread.currentThread().getName();
+    private final CustomerService service;
+    public CustomerController(CustomerService service){
+        this.service = service;
     }
 
-
-    @PostMapping("/{customerId}/kyc/verify")
-    ResponseEntity<>
-
-
-    PUT    /{customerId}/next-of-kin
-    GET    /{customerId}/next-of-kin
+    @PostMapping()
+    ResponseEntity<CustomerResponse> onboard(@Valid @RequestBody OnboardCustomerRequest request){
+        var c = service.onboard(new OnboardCommand(request.firstName(), request.lastName(), request.email(), request.phoneNumber()));
+        return ResponseEntity.created(URI.create("/api/v1/customers/" + c.getId())).body(CustomerResponse.from(c));
+    }
 
     @GetMapping("/{customerId}")
-    public String customerId
+    CustomerResponse get(@PathVariable UUID customerId) { return CustomerResponse.from(service.getOrThrow(customerId)); }
+
+    @PostMapping("/{customerId}/kyc/verify")
+    CustomerResponse verifyKyc(@PathVariable UUID customerId) { return CustomerResponse.from(service.verifyKyc(customerId)); }
+
+    @PutMapping("/{customerId}/next-of-kin")
+    NextOfKinResponse designate(@PathVariable UUID customerId, @Valid @RequestBody DesignateNextofKinRequest req) {
+        return CustomerResponse.from(service.designateNextofKin(customerId, req.customerId(), req.));
+    }
+
+    @GetMapping("/{customerId}/next-of-kin")
+    NextOfKinResponse nextOfKin(@PathVariable UUID customerId) {
+        // 404 via ResourceNotFoundException("NextOfKin", customerId) if none
+    }
+
+    @GetMapping("/hello")
+    String hello() { return "virtual=" + Thread.currentThread().isVirtual(); }
 }

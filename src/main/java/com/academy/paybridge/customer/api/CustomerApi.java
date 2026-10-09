@@ -7,5 +7,5 @@ public interface CustomerApi {
 
     CustomerSummary getCustomer(UUID id);
     boolean exists(UUID id);
-    Optional<NextofKinSummary> getNextKin(UUID customerId);
+    Optional<NextOfKinSummary> getNextKin(UUID customerId);
 }
