@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public record DesignateNextofKinRequest(
+public record DesignateNextOfKinRequest(
         @NotNull
-        UUID customerId,
+        UUID nextOfKinCustomerId,
 
         @NotNull
         Relationship relationship
