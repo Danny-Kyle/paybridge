@@ -5,7 +5,7 @@ spring:
     virtual:
       enabled: true
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/paybridge}
+    url: ${DB_URL:jdbc:postgresql://127.0.0.1:5433/paybridge}
     username: ${DB_USERNAME:paybridge}
     password: ${DB_PASSWORD:paybridge}
     hikari:
@@ -16,23 +16,21 @@ spring:
     hibernate:
       ddl-auto: validate
   flyway:
-    locations:
-      - classpath:db/migration
+    locations: classpath:db/migration
 
 server:
   port: 8080
 
 paybridge:
   routing:
-    next-of-kin-threshold-minor: 10000000
+    next-of-kin-threshold-minor: 1000000000    # 10,000,000 NGN, expressed in KOBO
   gateway:
     mode: simulated
   paystack:
     base-url: https://api.paystack.co
     secret-key: ${PAYSTACK_SECRET_KEY:}
+  compliance:
+    max-per-transaction-minor: 500000000       # 5,000,000 NGN in kobo
+    daily-limit-minor: 2000000000              # 20,000,000 NGN in kobo
   services:
     base-url: http://localhost:8081
-  compliance:
-    max-per-transaction-minor: 5000000
-    daily-limit-minor: 20000000
-
