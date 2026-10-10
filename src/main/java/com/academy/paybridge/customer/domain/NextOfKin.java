@@ -10,7 +10,7 @@ import java.util.UUID;
 @Table(name = "next_of_kin")
 public class NextOfKin extends BaseEntity {
     @Column(name = "customer_id", nullable = false, updatable = false)  private UUID customerId;
-    @Column(name = "next_of_kin_customerId", nullable = false) private UUID nextOfKinCustomerId;
+    @Column(name = "next_of_kin_customer_id", nullable = false) private UUID nextOfKinCustomerId;
     @Enumerated(EnumType.STRING) @Column(nullable = false) private Relationship relationship;
 
     protected NextOfKin(){};

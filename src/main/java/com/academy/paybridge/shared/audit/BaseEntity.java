@@ -1,50 +1,49 @@
 package com.academy.paybridge.shared.audit;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @MappedSuperclass
-@EntityListener
+@EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID id;
+    private UUID id;
 
     @CreatedDate
-    @Column(updatable = false, name = "created-at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @Column(name = "updated-at", nullable = false)
     @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
     @Version
-    protected Long version;
+    private Long version;
 
-    public UUID getId() {
-        return id;
-    };
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    };
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    };
+    public UUID getId() { return id; }
+    public Instant getCreatedAt() { return createdAt; }
+    public Instant getUpdatedAt() { return updatedAt; }
 
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof BaseEntity other)) return false;
         return id != null && id.equals(other.id);
     }
 
     @Override
-    public int hashCode(){return getClass().hashCode();    }
-
-
+    public int hashCode() { return getClass().hashCode(); }
 }
