@@ -63,6 +63,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return pd;
     }
 
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    ProblemDetail denied(Exception ex) { return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "Access denied"); }
+
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    ProblemDetail responseStatus(org.springframework.web.server.ResponseStatusException ex) {
+        return ProblemDetail.forStatusAndDetail(ex.getStatusCode(), ex.getReason()==null ? "Request rejected" : ex.getReason());
+    }
+
+    @ExceptionHandler(ArithmeticException.class)
+    ProblemDetail overflow(ArithmeticException ex) { return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT,"Amount exceeds supported precision or range"); }
+
     @ExceptionHandler(Exception.class)
     ProblemDetail handleUnexpected(Exception ex) {
         log.error("Unexpected error", ex);

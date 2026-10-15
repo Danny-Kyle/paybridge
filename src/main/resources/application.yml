@@ -1,4 +1,10 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OIDC_ISSUER:http://localhost:18080/realms/paybridge}
+          audiences: paybridge-api
   application:
     name: paybridge
   threads:
@@ -44,3 +50,4 @@ paybridge:
     daily-limit-minor: 2000000000              # 20,000,000 NGN in kobo
   services:
     base-url: http://localhost:8081
+# Local rates are illustrative; conversion is disabled outside local/test until a real adapter is selected.

@@ -16,8 +16,16 @@ import java.util.Arrays;
 public class OpenApiConfig {
 
     @Bean
-    OpenAPI paybridgeOpenApi() {
-        return new OpenAPI().info(new Info()
+    OpenAPI paybridgeOpenApi(@org.springframework.beans.factory.annotation.Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String issuer) {
+        return new OpenAPI().components(new io.swagger.v3.oas.models.Components()
+          .addSecuritySchemes("oidc",new io.swagger.v3.oas.models.security.SecurityScheme()
+            .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.OAUTH2)
+            .flows(new io.swagger.v3.oas.models.security.OAuthFlows().authorizationCode(
+              new io.swagger.v3.oas.models.security.OAuthFlow().authorizationUrl(issuer+"/protocol/openid-connect/auth")
+              .tokenUrl(issuer+"/protocol/openid-connect/token")
+              .scopes(new io.swagger.v3.oas.models.security.Scopes().addString("openid","OpenID Connect").addString("profile","Profile").addString("email","Email"))))))
+          .addSecurityItem(new io.swagger.v3.oas.models.security.SecurityRequirement().addList("oidc"))
+          .info(new Info()
                 .title("PayBridge API")
                 .version("v1")
                 .description("""
@@ -53,6 +61,9 @@ public class OpenApiConfig {
             ApiResponses responses = operation.getResponses();
             if (responses == null) return operation;
 
+            responses.putIfAbsent("401", new ApiResponse().description("Missing, expired or invalid token"));
+            responses.putIfAbsent("403", new ApiResponse().description("Role or resource ownership denied"));
+            responses.putIfAbsent("409", new ApiResponse().description("Conflicting idempotency request or state"));
             responses.putIfAbsent("400", new ApiResponse().description("Validation failed (problem+json with an 'errors' map)"));
             responses.putIfAbsent("422", new ApiResponse().description("Business rule violated (problem+json with a 'code')"));
             responses.putIfAbsent("500", new ApiResponse().description("Unexpected error"));
