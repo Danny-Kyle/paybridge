@@ -12,7 +12,7 @@ class CustomerOnboardedListener {
 
     CustomerOnboardedListener(AccountService accounts) { this.accounts = accounts; }
 
-    @org.springframework.modulith.events.ApplicationModuleListener
+    @ApplicationModuleListener
     void on(CustomerOnboarded event) {
         accounts.openDefaultAccount(event.customerId(), event.fullName());
     }
