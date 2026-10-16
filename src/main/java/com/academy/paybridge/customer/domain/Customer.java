@@ -31,7 +31,7 @@ public class Customer extends BaseEntity {
     };
 
     public String fullName(){
-        return firstName + "" + lastName;
+        return firstName + " " + lastName;
     }
     public boolean isKycVerified(){
         return kycStatus == KycStatus.VERIFIED;
@@ -61,7 +61,7 @@ public class Customer extends BaseEntity {
         var customer = new Customer();
         customer.firstName = firstName.trim();
         customer.lastName = lastName.trim();
-        customer.email = email.trim().toLowerCase();
+        customer.email = email.trim().toLowerCase(java.util.Locale.ROOT);
         customer.phoneNumber = phoneNumber.trim();
         customer.kycStatus = KycStatus.PENDING;
 

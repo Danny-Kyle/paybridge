@@ -15,17 +15,22 @@ import java.util.UUID;
 class AccountController {
 
     private final AccountApi accountApi;
+    private final com.academy.paybridge.customer.api.CustomerApi customers;
 
-    AccountController(AccountApi accountApi) { this.accountApi = accountApi; }
+    AccountController(AccountApi accountApi, com.academy.paybridge.customer.api.CustomerApi customers) {
+        this.accountApi=accountApi; this.customers=customers;
+    }
 
     @GetMapping("/by-customer/{customerId}")
     AccountSummary byCustomer(@PathVariable UUID customerId) {
+        customers.requireOwner(customerId);
         return accountApi.findPrimaryAccount(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", customerId));
     }
 
     @GetMapping("/by-customer/{customerId}/balance")
     BalanceResponse balance(@PathVariable UUID customerId) {
+        customers.requireOwner(customerId);
         return accountApi.findBalance(customerId).map(BalanceResponse::from)
                 .orElseThrow(() -> new ResourceNotFoundException("Balance", customerId));
     }
