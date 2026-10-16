@@ -3,7 +3,7 @@ Alright, so my main aim right now is to use Virtual threads to
 
 We want to get the Customer details first, this should be done in the /customer folder and everything relating to the Customer is in there as well
 
-Before we start implementation of any transfers at all we should get the customer details, but when the customer wants to create any transfers, the party they wih to transfer to needs to have the following provided:
+Before we start implementation of any transfers at all we should get the customer details, but when the customer wants to create any transfers, the party they want to transfer to needs to have the following provided:
 Get Details/Credentials
     Get their acount, (Task 1)
     get their current account balance, (Task 2) 
