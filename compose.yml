@@ -6,7 +6,7 @@ services:
       POSTGRES_DB: paybridge
       POSTGRES_USER: paybridge
       POSTGRES_PASSWORD: paybridge
-    ports: ["5432:5432"]
+    ports: ["15432:5432"]
     volumes: [pgdata:/var/lib/postgresql/data]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U paybridge -d paybridge"]
