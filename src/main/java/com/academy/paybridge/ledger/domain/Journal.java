@@ -43,8 +43,8 @@ public class Journal {
                 throw new BusinessRuleException("JOURNAL_MIXED_CURRENCY", "All lines must use one currency.");
             if (!l.amount().isPositive())
                 throw new BusinessRuleException("JOURNAL_BAD_AMOUNT", "Line amounts must be positive.");
-            if (l.direction() == Direction.DEBIT) debits += l.amount().minorUnits();
-            else credits += l.amount().minorUnits();
+            if (l.direction() == Direction.DEBIT) debits = Math.addExact(debits, l.amount().minorUnits());
+            else credits = Math.addExact(credits, l.amount().minorUnits());
         }
         if (debits != credits)
             throw new BusinessRuleException("JOURNAL_UNBALANCED", "Debits (" + debits + ") must equal credits (" + credits + ").");
