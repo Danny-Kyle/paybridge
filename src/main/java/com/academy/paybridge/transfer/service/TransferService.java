@@ -47,7 +47,7 @@ public class TransferService {
     private final TransferGateway gateway;
     private final ApplicationEventPublisher events;
     private final TransactionTemplate tx;
-    private final Clock clock;
+    private final  Clock clock;
 
     public TransferService(TransferRepository transfers, TransferRecipientRepository recipients,
                            CustomerApi customerApi, AccountApi accountApi, LedgerApi ledgerApi,
