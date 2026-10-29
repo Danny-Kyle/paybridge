@@ -22,8 +22,11 @@ import java.util.UUID;
 class TransferController {
 
     private final TransferService service;
+    private final com.academy.paybridge.customer.api.CustomerApi customers;
 
-    TransferController(TransferService service) { this.service = service; }
+    TransferController(TransferService service, com.academy.paybridge.customer.api.CustomerApi customers) {
+        this.service=service; this.customers=customers;
+    }
 
     @Operation(summary = "Initiate a transfer",
             description = """
@@ -44,6 +47,7 @@ class TransferController {
         if (idempotencyKey.isBlank() || idempotencyKey.length() > 64)
             throw new BusinessRuleException("BAD_IDEMPOTENCY_KEY", "Idempotency-Key must be 1 to 64 characters.");
 
+        customers.requireOwner(req.senderCustomerId());
         var transfer = service.initiate(new InitiateTransferCommand(idempotencyKey, req.senderCustomerId(),
                 req.recipientCustomerId(), new Money(req.amountMinor(), req.currency()), req.narration()));
         var body = TransferResponse.from(transfer);
@@ -58,5 +62,8 @@ class TransferController {
 
     @Operation(summary = "Get a transfer and its current status")
     @GetMapping("/{id}")
-    TransferResponse get(@PathVariable UUID id) { return TransferResponse.from(service.getOrThrow(id)); }
+    TransferResponse get(@PathVariable UUID id) {
+        var t=service.getOrThrow(id); customers.requireOwner(t.getSenderCustomerId());
+        return TransferResponse.from(t);
+    }
 }
