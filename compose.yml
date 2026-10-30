@@ -1,17 +1,28 @@
 services:
   postgres:
     image: postgres:17
-    container_name: paybridge-db
     environment:
       POSTGRES_DB: paybridge
       POSTGRES_USER: paybridge
-      POSTGRES_PASSWORD: paybridge
-    ports: ["15432:5432"]
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-paybridge-local-only}
+    ports: ["127.0.0.1:15432:5432"]
     volumes: [pgdata:/var/lib/postgresql/data]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U paybridge -d paybridge"]
       interval: 5s
       timeout: 3s
       retries: 10
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.1
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Set KEYCLOAK_ADMIN_PASSWORD locally}
+      KC_HOSTNAME: http://localhost:18080
+    ports: ["127.0.0.1:18080:8080"]
+    volumes:
+      - ./infra/keycloak:/opt/keycloak/data/import:ro
+      - kcdata:/opt/keycloak/data
 volumes:
   pgdata:
+  kcdata:

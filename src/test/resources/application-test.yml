@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:paybridge;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ''
+    driver-class-name: org.h2.Driver
+  flyway:
+    enabled: false
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:http-test-schema.sql
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://issuer.test
+          audiences: paybridge-api
+paybridge:
+  fx:
+    quote-ttl-seconds: 60

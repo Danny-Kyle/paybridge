@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    password: ${DB_PASSWORD:paybridge-local-only}
+  flyway:
+    locations: classpath:db/migration
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: paybridge-swagger
+      use-pkce-with-authorization-code-grant: true
+paybridge:
+  fx:
+    demo-ngn-per-usd: 1500.00000000
+    source-fee-cents: 100
+    quote-ttl-seconds: 60

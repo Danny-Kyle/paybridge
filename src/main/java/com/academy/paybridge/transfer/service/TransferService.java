@@ -47,7 +47,7 @@ public class TransferService {
     private final TransferGateway gateway;
     private final ApplicationEventPublisher events;
     private final TransactionTemplate tx;
-    private final  Clock clock;
+    private final Clock clock;
 
     public TransferService(TransferRepository transfers, TransferRecipientRepository recipients,
                            CustomerApi customerApi, AccountApi accountApi, LedgerApi ledgerApi,
@@ -63,7 +63,13 @@ public class TransferService {
     // NOT @Transactional on purpose: we must not hold DB locks while calling the gateway over HTTP.
     public Transfer initiate(InitiateTransferCommand cmd) {
         var existing = transfers.findByIdempotencyKey(cmd.idempotencyKey());
-        if (existing.isPresent()) return existing.get();                         // replay-safe
+        if (existing.isPresent()) {
+            var t=existing.get();
+            if(!t.getSenderCustomerId().equals(cmd.senderCustomerId()) || !t.getRequestedRecipientCustomerId().equals(cmd.recipientCustomerId())
+                || !t.amount().equals(cmd.amount()) || !java.util.Objects.equals(t.getNarration(),cmd.narration()))
+                throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT,"Idempotency key belongs to another request");
+            return t;
+        }                         // replay-safe
 
         if (cmd.senderCustomerId().equals(cmd.recipientCustomerId()))
             throw new BusinessRuleException("SELF_TRANSFER", "You cannot transfer to yourself.");

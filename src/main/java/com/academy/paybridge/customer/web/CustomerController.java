@@ -20,12 +20,16 @@ import java.util.UUID;
 public class CustomerController {
 
     private final CustomerService service;
+    private final com.academy.paybridge.customer.api.CustomerApi customerApi;
+    private final com.academy.paybridge.shared.security.CurrentActor actor;
 
-    public CustomerController(CustomerService service) { this.service = service; }
+    public CustomerController(CustomerService service, com.academy.paybridge.customer.api.CustomerApi customerApi,
+                              com.academy.paybridge.shared.security.CurrentActor actor) {
+        this.customerApi=customerApi; this.actor=actor; this.service = service; }
 
     @Operation(summary = "Onboard a customer",
             description = "Creates the customer with KYC status PENDING. A PayBridge NGN account is opened "
-                    + "asynchronously by the account module, so it may take a moment to appear.")
+                    + "in the onboarding transaction by the account module.")
     @ApiResponse(responseCode = "201", description = "Customer created")
     @PostMapping
     ResponseEntity<CustomerResponse> onboard(@Valid @RequestBody OnboardCustomerRequest req) {
@@ -35,9 +39,13 @@ public class CustomerController {
                 .body(CustomerResponse.from(customer));
     }
 
+    @GetMapping("/me")
+    CustomerResponse me() { return CustomerResponse.from(service.getOrThrow(customerApi.currentCustomerId())); }
+
     @Operation(summary = "Get a customer")
     @GetMapping("/{customerId}")
     CustomerResponse get(@PathVariable UUID customerId) {
+        customerApi.requireOwner(customerId);
         return CustomerResponse.from(service.getOrThrow(customerId));
     }
 
@@ -45,6 +53,7 @@ public class CustomerController {
             description = "A REJECTED customer cannot be verified (422, KYC_ALREADY_REJECTED).")
     @PostMapping("/{customerId}/kyc/verify")
     CustomerResponse verifyKyc(@PathVariable UUID customerId) {
+        actor.requireRole("COMPLIANCE");
         return CustomerResponse.from(service.verifyKyc(customerId));
     }
 
@@ -52,6 +61,7 @@ public class CustomerController {
             description = "Upsert: one next of kin per customer. Used by the transfer routing rule.")
     @PutMapping("/{customerId}/next-of-kin")
     NextOfKinResponse designate(@PathVariable UUID customerId, @Valid @RequestBody DesignateNextOfKinRequest req) {
+        customerApi.requireOwner(customerId);
         return NextOfKinResponse.from(
                 service.designateNextOfKin(customerId, req.nextOfKinCustomerId(), req.relationship()));
     }
@@ -59,6 +69,7 @@ public class CustomerController {
     @Operation(summary = "Get a customer's next of kin")
     @GetMapping("/{customerId}/next-of-kin")
     NextOfKinResponse nextOfKin(@PathVariable UUID customerId) {
+        customerApi.requireOwner(customerId);
         return service.findNextOfKin(customerId)
                 .map(NextOfKinResponse::from)
                 .orElseThrow(() -> new ResourceNotFoundException("NextOfKin", customerId));
